@@ -9,6 +9,7 @@
     },
     "scripts": {
         "index": "node --inspect --require ts-node/register/transpile-only index.ts",
+        "pastEvents": "node --inspect --require ts-node/register/transpile-only pastEvents.ts",
         "websocket": "node --inspect --require ts-node/register/transpile-only websocket.ts"
     },
     "devDependencies": {
