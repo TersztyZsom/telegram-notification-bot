@@ -1,25 +1,55 @@
 import TelegramBot from 'node-telegram-bot-api';
+import * as dotenv from "dotenv";
+dotenv.config();
 
-// Replace with your token from BotFather
-const token = '7521050434:AAFivsQ3p5g2UMbva_PKVN3510RLGTkZTTU';
 
-// Create a new bot instance
-const bot = new TelegramBot(token, { polling: true });
+/**
+ * Send a notif on Telegram
+ */
+export const sendTelegramNotification = async (message: string) => {
+    const botToken = process.env.BOT_TOKEN || '';
+    const bot = new TelegramBot(botToken, { polling: true });
+    const chatId = Number(process.env.CHAT_ID); 
+    try {
+        const response = await bot.sendMessage(chatId, message);
+        console.log('Message sent successfully:', response);
+        bot.stopPolling();
+        return response;
+    } catch (error) {
+        console.error('Error sending message:', error);
+        bot.stopPolling();
+        throw error;
+    }
+};
 
-// Replace this with your Telegram chat ID
-const yourChatId = 7420692858;
 
-// Start sending "Hello World" every 30 seconds
-setInterval(() => {
-    console.log('yaaaa');
-    bot.sendMessage(yourChatId, 'Hello World');
-}, 3000);
-
-// Listen for the /start command to get chat ID
-bot.onText(/\/start/, (msg) => {
-    const chatId = msg.chat.id;
-    bot.sendMessage(chatId, 'Hello! Your chat ID issss: ' + chatId);
-    console.log('Your chat ID is: ' + chatId);
-});
-
-console.log('Bot is running...');
+/**
+ * Example
+ */
+(async () => {
+    const types = ['💎 SALE', '🟣 Bid', '🔻 Offered'];
+    const fromLabel = 'xxx';
+    const toLabel = 'yyy';
+    const price = 999;
+    const valuation = 888;
+    const punkId = 4882;
+    const gas = 99;
+    
+    const message: string = `
+    ${types[0]}
+    
+    from ${fromLabel}
+    to ${toLabel}
+    
+    price ${price}Ξ  
+    
+    valuation ${valuation}Ξ 
+    
+    gas ${gas} gwei
+    
+    https://cryptopunks.app/cryptopunks/details/${punkId}
+    `;
+    
+    const response = await sendTelegramNotification(message);
+    console.log('response', response);
+})();
