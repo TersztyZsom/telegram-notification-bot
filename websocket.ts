@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import fs from "fs";
 import { AbiItem } from 'web3-utils';
-import { sendTelegramNotification } from "./index";
+import { sendTelegramNotification } from "./utils";
 import * as dotenv from "dotenv";
 dotenv.config();
 

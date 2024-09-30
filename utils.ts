@@ -27,9 +27,8 @@ export const sendTelegramNotification = async (message: string) => {
  */
 export const formatAddress = (address: string) => {
     let formattedAddress;
-    if (false) {
-        // in dict
-        formattedAddress = address;
+    if (Object.keys(addressDictionary).includes(address.toLowerCase())) {
+        formattedAddress = addressDictionary[address.toLowerCase()];
     }
     else {
         formattedAddress = address.slice(0, 6);
