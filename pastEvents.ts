@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import fs from "fs";
 import { AbiItem } from 'web3-utils';
-import { sendTelegramNotification, formatAddress } from "./utils";
+import { handlePunkOffered, handlePunkBidEntered, handlePunkBought } from "./handleEvents";
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -19,123 +19,15 @@ const contractABI: AbiItem[] =  JSON.parse(fs.readFileSync("abi.json", "utf8"));
 
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-
-const types = {
-    sale: '💎 SALE 💎', 
-    bid: '🟣 BID 🟣', 
-    offered: '🔻 OFFERED 🔻'
-};
-
-/**
- * Build the message string
- */
-const messageBuilder = (messageObject: any) => {
-    let message = `${messageObject.type}`;
-    message = message + `\n\nFrom: ${messageObject.from}`;
-    if (messageObject.to) message = message + `\nTo: ${messageObject.to}`;
-    message = message + `\n\nPrice: ${messageObject.price}Ξ`;
-    message = message + `\nValuation: ${messageObject.valuation}Ξ`;
-    message = message + `\n\nGas: ${messageObject.gas} gwei`;
-    message = message + `\n\nhttps://cryptopunks.app/cryptopunks/details/${messageObject.punkId}`;
-
-    // TODO: add blur & nftx bid floor, and overall punkfloor
-    return message;
-}
-
-/**
- * Handle Punk Offered
- */
-const handlePunkOffered = async (event: any) => {
-    const transactionHash = event.transactionHash;
-    const transactionDetails = await web3.eth.getTransaction(transactionHash);
-
-    const { from, to, gasPrice } = transactionDetails;
-    const { punkIndex, minValue, toAddress } = event.returnValues;
-
-    const messageObject: any = {
-        type: types.offered,
-        from: formatAddress(from),
-        price: web3.utils.fromWei(minValue, 'ether'),
-        valuation: 888,
-        gas: Math.round(Number(web3.utils.fromWei(gasPrice, 'gwei'))),
-        punkId: punkIndex
-    }
-    if (toAddress !== '0x0000000000000000000000000000000000000000') messageObject.to = formatAddress(toAddress);
-    const message: string = messageBuilder(messageObject);
-
-    await sendTelegramNotification(message);
-}
-
-/**
- * Handle Punk Sale
- */
-const handlePunkBought = async (event: any) => {
-    const transactionHash = event.transactionHash;
-    const transactionDetails = await web3.eth.getTransaction(transactionHash);
-
-    const { gasPrice } = transactionDetails;
-    const { fromAddress, toAddress, punkIndex, value } = event.returnValues;
-
-    const messageObject: any = {
-        type: types.sale,
-        from: formatAddress(fromAddress),
-        to: formatAddress(toAddress),
-        price: web3.utils.fromWei(value, 'ether'),
-        valuation: 888,
-        gas: Math.round(Number(web3.utils.fromWei(gasPrice, 'gwei'))),
-        punkId: punkIndex
-    }
-    const message: string = messageBuilder(messageObject);
-
-    await sendTelegramNotification(message);
-}
-
-/**
- * Handle Punk Bid
- */
-const handlePunkBidEntered = async (event: any) => {
-    const transactionHash = event.transactionHash;
-    const transactionDetails = await web3.eth.getTransaction(transactionHash);
-
-    const { gasPrice } = transactionDetails;
-    const { fromAddress, punkIndex, value } = event.returnValues;
-
-    // filtering out bids that are way below valuation
-    const minBidLimit = 20 //eth
-    if (Number(web3.utils.fromWei(value, 'ether')) < minBidLimit) {
-        console.log(`Bid too low... Skip.`);
-        return;
-    }
-    
-    const messageObject: any = {
-        type: types.bid,
-        from: formatAddress(fromAddress),
-        price: web3.utils.fromWei(value, 'ether'),
-        valuation: 888,
-        gas: Math.round(Number(web3.utils.fromWei(gasPrice, 'gwei'))),
-        punkId: punkIndex
-    }
-    const message: string = messageBuilder(messageObject);
-
-    await sendTelegramNotification(message);
-}
-
-/**
- * Handle Other
- */
-const handleOther = async (event: any) => {
-    const message: string = `${event.event}\n\nhttps://cryptopunks.app/cryptopunks/details/${event.returnValues.punkIndex}`;
-    await sendTelegramNotification(message);
-}
-
 /**
  * Main
  */
 const getPastEvents = async () => {
 
+    const PAST_HOURS = 12;
     const currentBlockNumber = Number(await web3.eth.getBlockNumber());
     const events: any = await contract.getPastEvents('allEvents', {
-        fromBlock: currentBlockNumber - (5 * 60 * 2),
+        fromBlock: currentBlockNumber - (5 * 60 * PAST_HOURS),
         toBlock: currentBlockNumber
         // fromBlock: 20740913-1,
         // toBlock: 20740913+100
@@ -163,7 +55,7 @@ const getPastEvents = async () => {
                 console.log('Other event:', event.event);
         }
         // timeout
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 1500));
     };
 
 };
