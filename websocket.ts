@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import fs from "fs";
 import { AbiItem } from 'web3-utils';
-import { handlePunkOffered, handlePunkBidEntered, handlePunkBought } from "./handleEvents";
+import { handlePunkOffered, handlePunkBidEntered, handlePunkBought, handleOther } from "./handleEvents";
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -19,7 +19,6 @@ const contractABI: AbiItem[] =  JSON.parse(fs.readFileSync("abi.json", "utf8"));
 
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-// Listen for the 'PunkBought' event (triggered by acceptBidForPunk)
 contract.events.allEvents({})
     .on('data', async (event: any) => {
         switch (event.event) {
@@ -36,6 +35,7 @@ contract.events.allEvents({})
                 await handlePunkBidEntered(event);
                 break;
             default:
+                await handleOther(event)
                 console.log('Other event:', event.event);
         }
     });

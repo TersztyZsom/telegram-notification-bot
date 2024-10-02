@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import fs from "fs";
 import { AbiItem } from 'web3-utils';
-import { handlePunkOffered, handlePunkBidEntered, handlePunkBought } from "./handleEvents";
+import { handlePunkOffered, handlePunkBidEntered, handlePunkBought, handleOther } from "./handleEvents";
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -24,7 +24,7 @@ const contract = new web3.eth.Contract(contractABI, contractAddress);
  */
 const getPastEvents = async () => {
 
-    const PAST_HOURS = 12;
+    const PAST_HOURS = 14;
     const currentBlockNumber = Number(await web3.eth.getBlockNumber());
     const events: any = await contract.getPastEvents('allEvents', {
         fromBlock: currentBlockNumber - (5 * 60 * PAST_HOURS),
@@ -51,7 +51,7 @@ const getPastEvents = async () => {
                 await handlePunkBidEntered(event);
                 break;
             default:
-                // await handleOther(event)
+                await handleOther(event);
                 console.log('Other event:', event.event);
         }
         // timeout
