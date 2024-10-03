@@ -6,17 +6,11 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 console.log('Websocket running...')
-
 const infuraProjectId: string = process.env.INFURA_PROJECT_ID || '';
-
 const webSocketProvider: string = `wss://mainnet.infura.io/ws/v3/${infuraProjectId}`;
-
 const web3: Web3 = new Web3(new Web3.providers.WebsocketProvider(webSocketProvider));
-
 const contractAddress: string = '0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB';
-
-const contractABI: AbiItem[] =  JSON.parse(fs.readFileSync("abi.json", "utf8"));
-
+const contractABI: AbiItem[] =  JSON.parse(fs.readFileSync("src/abi.json", "utf8"));
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
 /**
@@ -24,7 +18,7 @@ const contract = new web3.eth.Contract(contractABI, contractAddress);
  */
 const getPastEvents = async () => {
 
-    const PAST_HOURS = 14;
+    const PAST_HOURS = 6;
     const currentBlockNumber = Number(await web3.eth.getBlockNumber());
     const events: any = await contract.getPastEvents('allEvents', {
         fromBlock: currentBlockNumber - (5 * 60 * PAST_HOURS),
