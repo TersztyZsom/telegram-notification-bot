@@ -30,6 +30,6 @@ contract.events.allEvents({})
                 break;
             default:
                 console.log(`${event.event} event (other), Punk ${event.returnValues.punkIndex}`);
-                await handleOther(event);
+                // await handleOther(event);
         }
     });
