@@ -33,20 +33,19 @@ const getPastEvents = async () => {
         const event = events[i];
         switch (event.event) {
             case 'PunkOffered':
-                console.log('PunkOffered event');
+                console.log(`PunkOffered event, Punk ${event.returnValues.punkIndex}`);
                 await handlePunkOffered(event);
                 break;
             case 'PunkBought':
-                console.log('PunkBough event');
+                console.log(`PunkBought event, Punk ${event.returnValues.punkIndex}`);
                 await handlePunkBought(event);
                 break;
             case 'PunkBidEntered':
-                console.log('PunkBidEntered event');
+                console.log(`PunkBidEntered event, Punk ${event.returnValues.punkIndex}`);
                 await handlePunkBidEntered(event);
                 break;
             default:
-                await handleOther(event);
-                console.log('Other event:', event.event);
+                console.log(`${event.event} event (other), Punk ${event.returnValues.punkIndex}`);
         }
         // timeout
         await new Promise(resolve => setTimeout(resolve, 1500));

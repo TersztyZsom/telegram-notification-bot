@@ -21,15 +21,14 @@ const types = {
 const messageBuilder = (messageObject: any) => {
     let message = `${messageObject.type}`;
 
-    message = message + `\n\nPUNK [${messageObject.punkId}](https://cryptopunks.app/cryptopunks/details/${messageObject.punkId}`;
+    message = message + `\n\nPunk: [${messageObject.punkId}](https://cryptopunks.app/cryptopunks/details/${messageObject.punkId})`;
     message = message + `\n\nFrom: [${formatAddress(messageObject.from)}](https://cryptopunks.app/cryptopunks/accountinfo?account=${messageObject.from})`;
     if (messageObject.to) message = message + `\nTo: [${formatAddress(messageObject.to)}](https://cryptopunks.app/cryptopunks/accountinfo?account=${messageObject.to})`;
     message = message + `\n\nPrice: [${messageObject.price}Ξ](https://cryptopunks.app/cryptopunks/details/${messageObject.punkId})`;
     message = message + `\nValuation: [${messageObject.valuation}Ξ](https://www.deepnftvalue.com/asset/cryptopunks/${messageObject.punkId})`;
     message = message + `\n\nNFTX: ${999}Ξ`;
     message = message + `\nBlur: ${999}Ξ`;
-    message = message + `\nGas: ${messageObject.gas}g`;
-    // message = message + `\n\nhttps://cryptopunks.app/cryptopunks/details/${messageObject.punkId}`;
+    message = message + `\nGas: ${messageObject.gas}\n`;
 
     return message;
 }
@@ -41,7 +40,7 @@ export const handlePunkOffered = async (event: any) => {
     const transactionHash = event.transactionHash;
     const transactionDetails = await web3.eth.getTransaction(transactionHash);
 
-    const { from, to, gasPrice } = transactionDetails;
+    const { from, gasPrice } = transactionDetails;
     const { punkIndex, minValue, toAddress } = event.returnValues;
     const valuation = await getValuation(punkIndex);
 

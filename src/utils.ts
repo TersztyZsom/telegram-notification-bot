@@ -20,10 +20,6 @@ export const sendTelegramNotification = async (message: string) => {
         throw error;
     }
 };
-// (async () => {
-//     const response = await sendTelegramNotification('test message');
-//     console.log('response', response);
-// })();
 
 
 /**
