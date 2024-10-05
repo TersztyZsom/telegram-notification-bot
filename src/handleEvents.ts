@@ -95,13 +95,14 @@ export const handlePunkBought = async (event: any) => {
 /**
  * Handle Punk Bid
  */
-export const handlePunkBidEntered = async (event: any) => {
+export const handlePunkBidEntered = async (event: any, contract: any) => {
     const transactionHash = event.transactionHash;
     const transactionDetails = await web3.eth.getTransaction(transactionHash);
 
     const { gasPrice } = transactionDetails;
     const { fromAddress, punkIndex, value } = event.returnValues;
     const valuation = await getValuation(punkIndex);
+    const toAddress = (await contract.methods.punkIndexToAddress(punkIndex).call()).toLowerCase();
 
     // filtering out bids that are way below valuation
     const minBidLimit = 20 //eth
@@ -113,6 +114,7 @@ export const handlePunkBidEntered = async (event: any) => {
     const messageObject: any = {
         type: types.bid,
         from: fromAddress,
+        to: toAddress,
         price: web3.utils.fromWei(value, 'ether'),
         valuation: valuation,
         gas: Math.round(Number(web3.utils.fromWei(gasPrice, 'gwei'))),

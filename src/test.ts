@@ -18,8 +18,8 @@ const contract = new web3.eth.Contract(contractABI, contractAddress);
  */
 const getPastEvents = async () => {
 
-    const SPECIFIC_BLOCK = 20886445;
-    const PAST_HOURS = 24;
+    const SPECIFIC_BLOCK = 20896569;
+    const PAST_HOURS = 12;
     const currentBlockNumber = Number(await web3.eth.getBlockNumber());
     const events: any = await contract.getPastEvents('allEvents', {
         // fromBlock: currentBlockNumber - (5 * 60 * PAST_HOURS),
@@ -43,7 +43,7 @@ const getPastEvents = async () => {
                 break;
             case 'PunkBidEntered':
                 console.log(`PunkBidEntered event, Punk ${event.returnValues.punkIndex}`);
-                await handlePunkBidEntered(event);
+                await handlePunkBidEntered(event, contract);
                 break;
             default:
                 console.log(`${event.event} event (other), Punk ${event.returnValues.punkIndex}`);
