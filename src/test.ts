@@ -18,13 +18,14 @@ const contract = new web3.eth.Contract(contractABI, contractAddress);
  */
 const getPastEvents = async () => {
 
-    const PAST_HOURS = 6;
+    const SPECIFIC_BLOCK = 20886445;
+    const PAST_HOURS = 24;
     const currentBlockNumber = Number(await web3.eth.getBlockNumber());
     const events: any = await contract.getPastEvents('allEvents', {
-        fromBlock: currentBlockNumber - (5 * 60 * PAST_HOURS),
-        toBlock: currentBlockNumber
-        // fromBlock: 20740913-1,
-        // toBlock: 20740913+100
+        // fromBlock: currentBlockNumber - (5 * 60 * PAST_HOURS),
+        // toBlock: currentBlockNumber
+        fromBlock: SPECIFIC_BLOCK-1,
+        toBlock: SPECIFIC_BLOCK+1
     });
 
     const startIndex = 0;

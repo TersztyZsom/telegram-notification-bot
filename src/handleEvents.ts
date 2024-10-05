@@ -28,7 +28,8 @@ const messageBuilder = (messageObject: any) => {
     message = message + `\nValuation: [${messageObject.valuation}Ξ](https://www.deepnftvalue.com/asset/cryptopunks/${messageObject.punkId})`;
     message = message + `\n\nNFTX: ${999}Ξ`;
     message = message + `\nBlur: ${999}Ξ`;
-    message = message + `\nGas: ${messageObject.gas}\n`;
+    message = message + `\nPunk: [Floor](https://cryptopunks.app/cryptopunks/forsale)`;
+    message = message + `\nGas: ${messageObject.gas}`;
 
     return message;
 }
@@ -66,8 +67,16 @@ export const handlePunkBought = async (event: any) => {
     const transactionDetails = await web3.eth.getTransaction(transactionHash);
 
     const { gasPrice } = transactionDetails;
-    const { fromAddress, toAddress, punkIndex, value } = event.returnValues;
+    const { fromAddress, punkIndex } = event.returnValues;
+    let { toAddress, value } = event.returnValues;
     const valuation = await getValuation(punkIndex);
+
+    if (toAddress === '0x0000000000000000000000000000000000000000') { // bid accepted sale
+        const transactionReceipt = await web3.eth.getTransactionReceipt(transactionHash);
+        toAddress = '0x' + transactionReceipt.logs[0].topics[2].slice(26);
+        const decodedParams = web3.eth.abi.decodeParameters([{name: 'punkIndex', type: 'uint256' }, { name: 'minPrice', type: 'uint256' }], transactionDetails.data.slice(10));
+        value = decodedParams.minPrice;
+    }
 
     const messageObject: any = {
         type: types.sale,
