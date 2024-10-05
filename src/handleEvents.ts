@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { sendTelegramNotification, formatAddress, getValuation } from "./utils";
+import { sendTelegramNotification, formatAddress, getValuation, getTopBlurBid, getTopNFTXBid } from "./utils";
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -26,8 +26,8 @@ const messageBuilder = (messageObject: any) => {
     if (messageObject.to) message = message + `\nTo: [${formatAddress(messageObject.to)}](https://cryptopunks.app/cryptopunks/accountinfo?account=${messageObject.to})`;
     message = message + `\n\nPrice: [${messageObject.price}Ξ](https://cryptopunks.app/cryptopunks/details/${messageObject.punkId})`;
     message = message + `\nValuation: [${messageObject.valuation}Ξ](https://www.deepnftvalue.com/asset/cryptopunks/${messageObject.punkId})`;
-    message = message + `\n\nNFTX: ${999}Ξ`;
-    message = message + `\nBlur: ${999}Ξ`;
+    message = message + `\n\nNFTX: ${messageObject.nftx}Ξ`;
+    message = message + `\nBlur: ${messageObject.blur}Ξ`;
     message = message + `\nPunk: [Floor](https://cryptopunks.app/cryptopunks/forsale)`;
     message = message + `\nGas: ${messageObject.gas}`;
 
@@ -44,16 +44,20 @@ export const handlePunkOffered = async (event: any) => {
     const { from, gasPrice } = transactionDetails;
     const { punkIndex, minValue, toAddress } = event.returnValues;
     const valuation = await getValuation(punkIndex);
+    const topBlurBid = await getTopBlurBid();
+    const topNFTBid = await getTopNFTXBid();
 
     const messageObject: any = {
         type: types.offered,
         from: from,
         price: web3.utils.fromWei(minValue, 'ether'),
         valuation: valuation,
+        blur: topBlurBid,
+        nftx: topNFTBid,
         gas: Math.round(Number(web3.utils.fromWei(gasPrice, 'gwei'))),
         punkId: punkIndex
     }
-    if (toAddress !== '0x0000000000000000000000000000000000000000') messageObject.to = formatAddress(toAddress);
+    if (toAddress !== '0x0000000000000000000000000000000000000000') messageObject.to = toAddress;
     const message: string = messageBuilder(messageObject);
 
     await sendTelegramNotification(message);
@@ -70,6 +74,8 @@ export const handlePunkBought = async (event: any) => {
     const { fromAddress, punkIndex } = event.returnValues;
     let { toAddress, value } = event.returnValues;
     const valuation = await getValuation(punkIndex);
+    const topBlurBid = await getTopBlurBid();
+    const topNFTBid = await getTopNFTXBid();
 
     if (toAddress === '0x0000000000000000000000000000000000000000') { // bid accepted sale
         const transactionReceipt = await web3.eth.getTransactionReceipt(transactionHash);
@@ -84,6 +90,8 @@ export const handlePunkBought = async (event: any) => {
         to: toAddress,
         price: web3.utils.fromWei(value, 'ether'),
         valuation: valuation,
+        blur: topBlurBid,
+        nftx: topNFTBid,
         gas: Math.round(Number(web3.utils.fromWei(gasPrice, 'gwei'))),
         punkId: punkIndex
     }
@@ -101,8 +109,10 @@ export const handlePunkBidEntered = async (event: any, contract: any) => {
 
     const { gasPrice } = transactionDetails;
     const { fromAddress, punkIndex, value } = event.returnValues;
-    const valuation = await getValuation(punkIndex);
     const toAddress = (await contract.methods.punkIndexToAddress(punkIndex).call()).toLowerCase();
+    const valuation = await getValuation(punkIndex);
+    const topBlurBid = await getTopBlurBid();
+    const topNFTBid = await getTopNFTXBid();
 
     // filtering out bids that are way below valuation
     const minBidLimit = 20 //eth
@@ -117,6 +127,8 @@ export const handlePunkBidEntered = async (event: any, contract: any) => {
         to: toAddress,
         price: web3.utils.fromWei(value, 'ether'),
         valuation: valuation,
+        blur: topBlurBid,
+        nftx: topNFTBid,
         gas: Math.round(Number(web3.utils.fromWei(gasPrice, 'gwei'))),
         punkId: punkIndex
     }
