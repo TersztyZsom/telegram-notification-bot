@@ -26,7 +26,7 @@ contract.events.allEvents({})
                 break;
             case 'PunkBidEntered':
                 console.log(`PunkBidEntered event, Punk ${event.returnValues.punkIndex}`);
-                await handlePunkBidEntered(event);
+                await handlePunkBidEntered(event, contract);
                 break;
             default:
                 console.log(`${event.event} event (other), Punk ${event.returnValues.punkIndex}`);

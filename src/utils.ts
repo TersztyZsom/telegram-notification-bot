@@ -53,23 +53,20 @@ export async function getValuation(punkId: string): Promise<number> {
 }
 
 
-/**
- * Get top blur bid
- */
 export async function getTopBlurBid(): Promise<number> {
     try {
-        const url = `https://core-api.prod.blur.io/v1/collections/wrapped-cryptopunks`;
-        // const response = await axios.get(url);
-        // console.log('response', response);
-        // const valuationPrice = response.data?.valuation?.price;
-        // return valuationPrice ? parseFloat(valuationPrice) : -1;
-        return 666;
+        const url = `https://api.reservoir.tools/orders/bids/v6?sources=blur.io&contracts=0xb7f7f6c52f2e2fdb1963eab30438024864c313f6`;
+        const response = await axios.get(url);
+        const orders = response.data.orders;
+        const collectionBids = orders.filter((o: any) => o.criteria.kind === 'collection');
+        const topCollectionBid = collectionBids.length > 0 ? collectionBids[0].price.amount.native : -1;
+        console.log('topBid', topCollectionBid);
+        return topCollectionBid;
     } catch (error) {
         console.error('Error fetching valuation:', error);
         return null;
     }
 }
-
 
 /**
  * Get top NFTX sell price

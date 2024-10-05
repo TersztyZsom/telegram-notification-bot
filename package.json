@@ -4,11 +4,13 @@
         "dotenv": "^16.4.5",
         "grammy": "^1.30.0",
         "node-telegram-bot-api": "^0.66.0",
+        "puppeteer": "^23.5.0",
         "ts-node": "^10.9.2",
         "typescript": "^5.6.2",
         "web3": "^4.13.0"
     },
     "scripts": {
+        "index": "node --inspect --require ts-node/register/transpile-only src/index.ts",
         "test": "node --inspect --require ts-node/register/transpile-only src/test.ts",
         "prod": "node --inspect --require ts-node/register/transpile-only src/prod.ts"
     },

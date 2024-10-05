@@ -7,5 +7,6 @@ export const addressDictionary: { [key: string]: string } = {
     '0xa92a3cd26d44a32b6e649c7ce388c295718f8560': '0xa92 (Trader1)',
     '0x3042887f97821ec36be64d2677efd2e943a4cb0f': '0x304 (Trader2)',
     '0x9ecc656920bd5a0908c70adcb345fe721d69ee43': '0x9ec (Trader3)',
-    '0x8fc90ab3f9c0413b2fbf57b516f1b986d9dd98d9': '0x8fc (Trader4)'
+    '0x8fc90ab3f9c0413b2fbf57b516f1b986d9dd98d9': '0x8fc (Trader4)',
+    '0xdea02c834a94acac7e709f80702c62abd02e8dcb': '0xdea (Trader5)',
 }
