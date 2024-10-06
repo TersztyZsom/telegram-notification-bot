@@ -73,12 +73,7 @@ export async function getTopBlurBid(): Promise<number> {
  */
 export async function getTopNFTXBid(): Promise<number> {
     try {
-        const url = `https://core-api.prod.blur.io/v1/collections/wrapped-cryptopunks`;
-        // const response = await axios.get(url);
-        // console.log('response', response);
-        // const valuationPrice = response.data?.valuation?.price;
-        // return valuationPrice ? parseFloat(valuationPrice) : -1;
-        return 555;
+        return -1;
     } catch (error) {
         console.error('Error fetching valuation:', error);
         return null;

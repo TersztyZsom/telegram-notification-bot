@@ -26,7 +26,7 @@ const messageBuilder = (messageObject: any) => {
     if (messageObject.to) message = message + `\nTo: [${formatAddress(messageObject.to)}](https://cryptopunks.app/cryptopunks/accountinfo?account=${messageObject.to})`;
     message = message + `\n\nPrice: [${messageObject.price}Ξ](https://cryptopunks.app/cryptopunks/details/${messageObject.punkId})`;
     message = message + `\nValuation: [${messageObject.valuation}Ξ](https://www.deepnftvalue.com/asset/cryptopunks/${messageObject.punkId})`;
-    message = message + `\n\nNFTX: ${messageObject.nftx}Ξ`;
+    message = message + `\n\nNFTX: [${messageObject.nftx}Ξ](https://v2.nftx.io/vault/0x269616d549d7e8eaa82dfb17028d0b212d11232a/info/)`;
     message = message + `\nBlur: [${messageObject.blur}Ξ](https://blur.io/eth/collection/wrapped-cryptopunks/bids)`;
     message = message + `\nPunk: [Floor](https://cryptopunks.app/cryptopunks/forsale)`;
     message = message + `\nGas: ${messageObject.gas}`;
