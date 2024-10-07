@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import fs from "fs";
 import { AbiItem } from 'web3-utils';
-import { handlePunkOffered, handlePunkBidEntered, handlePunkBought, handleOther } from "./handleEvents";
+import { handlePunkOffered, handlePunkBidEntered, handlePunkBought } from "./handleEvents";
 import * as dotenv from "dotenv";
 dotenv.config();
 

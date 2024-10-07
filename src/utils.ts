@@ -2,6 +2,7 @@ import TelegramBot from 'node-telegram-bot-api';
 import axios from 'axios';
 import * as dotenv from "dotenv";
 import { addressDictionary } from "./constants";
+import { timezone } from "./timezone";
 dotenv.config();
 
 
@@ -25,7 +26,7 @@ export const sendTelegramNotification = async (message: string) => {
 /**
  * Address formatter
  */
-export const formatAddress = (address: string) => {
+export async function formatAddress(address: string) {
     let formattedAddress;
     if (Object.keys(addressDictionary).includes(address.toLowerCase())) {
         formattedAddress = addressDictionary[address.toLowerCase()];
@@ -33,6 +34,8 @@ export const formatAddress = (address: string) => {
     else {
         formattedAddress = address.slice(0, 6);
     }
+    const addressTimezone = await timezone(address);
+    formattedAddress = formattedAddress + ` (${addressTimezone})`
     return formattedAddress;
 };
 
@@ -60,7 +63,6 @@ export async function getTopBlurBid(): Promise<number> {
         const orders = response.data.orders;
         const collectionBids = orders.filter((o: any) => o.criteria.kind === 'collection');
         const topCollectionBid = collectionBids.length > 0 ? collectionBids[0].price.amount.native : -1;
-        console.log('topBid', topCollectionBid);
         return topCollectionBid;
     } catch (error) {
         console.error('Error fetching valuation:', error);

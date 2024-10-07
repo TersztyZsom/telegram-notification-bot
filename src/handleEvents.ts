@@ -1,5 +1,6 @@
 import Web3 from 'web3';
 import { sendTelegramNotification, formatAddress, getValuation, getTopBlurBid, getTopNFTXBid } from "./utils";
+import { actionTypes } from "./constants";
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -9,21 +10,16 @@ const webSocketProvider: string = `wss://mainnet.infura.io/ws/v3/${infuraProject
 
 const web3: Web3 = new Web3(new Web3.providers.WebsocketProvider(webSocketProvider));
 
-const types = {
-    sale: '💎 SALE 💎', 
-    bid: '🟣 BID 🟣', 
-    offered: '🔻 OFFERED 🔻'
-};
 
 /**
  * Build the message string
  */
-const messageBuilder = (messageObject: any) => {
+const messageBuilder = async (messageObject: any) => {
     let message = `${messageObject.type}`;
 
     message = message + `\n\nPunk: [${messageObject.punkId}](https://cryptopunks.app/cryptopunks/details/${messageObject.punkId})`;
-    message = message + `\n\nFrom: [${formatAddress(messageObject.from)}](https://cryptopunks.app/cryptopunks/accountinfo?account=${messageObject.from})`;
-    if (messageObject.to) message = message + `\nTo: [${formatAddress(messageObject.to)}](https://cryptopunks.app/cryptopunks/accountinfo?account=${messageObject.to})`;
+    message = message + `\n\nFrom: [${(await formatAddress(messageObject.from))}](https://cryptopunks.app/cryptopunks/accountinfo?account=${messageObject.from})`;
+    if (messageObject.to) message = message + `\nTo: [${(await formatAddress(messageObject.to))}](https://cryptopunks.app/cryptopunks/accountinfo?account=${messageObject.to})`;
     message = message + `\n\nPrice: [${messageObject.price}Ξ](https://cryptopunks.app/cryptopunks/details/${messageObject.punkId})`;
     message = message + `\nValuation: [${messageObject.valuation}Ξ](https://www.deepnftvalue.com/asset/cryptopunks/${messageObject.punkId})`;
     message = message + `\n\nNFTX: [${messageObject.nftx}Ξ](https://v2.nftx.io/vault/0x269616d549d7e8eaa82dfb17028d0b212d11232a/info/)`;
@@ -48,7 +44,7 @@ export const handlePunkOffered = async (event: any) => {
     const topNFTBid = await getTopNFTXBid();
 
     const messageObject: any = {
-        type: types.offered,
+        type: actionTypes.offered,
         from: from,
         price: web3.utils.fromWei(minValue, 'ether'),
         valuation: valuation,
@@ -58,7 +54,7 @@ export const handlePunkOffered = async (event: any) => {
         punkId: punkIndex
     }
     if (toAddress !== '0x0000000000000000000000000000000000000000') messageObject.to = toAddress;
-    const message: string = messageBuilder(messageObject);
+    const message: string = await messageBuilder(messageObject);
 
     await sendTelegramNotification(message);
 }
@@ -85,7 +81,7 @@ export const handlePunkBought = async (event: any) => {
     }
 
     const messageObject: any = {
-        type: types.sale,
+        type: actionTypes.sale,
         from: fromAddress,
         to: toAddress,
         price: web3.utils.fromWei(value, 'ether'),
@@ -95,7 +91,7 @@ export const handlePunkBought = async (event: any) => {
         gas: Math.round(Number(web3.utils.fromWei(gasPrice, 'gwei'))),
         punkId: punkIndex
     }
-    const message: string = messageBuilder(messageObject);
+    const message: string = await messageBuilder(messageObject);
 
     await sendTelegramNotification(message);
 }
@@ -122,7 +118,7 @@ export const handlePunkBidEntered = async (event: any, contract: any) => {
     }
     
     const messageObject: any = {
-        type: types.bid,
+        type: actionTypes.bid,
         from: fromAddress,
         to: toAddress,
         price: web3.utils.fromWei(value, 'ether'),
@@ -132,7 +128,7 @@ export const handlePunkBidEntered = async (event: any, contract: any) => {
         gas: Math.round(Number(web3.utils.fromWei(gasPrice, 'gwei'))),
         punkId: punkIndex
     }
-    const message: string = messageBuilder(messageObject);
+    const message: string = await messageBuilder(messageObject);
 
     await sendTelegramNotification(message);
 }
